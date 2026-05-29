@@ -3,66 +3,200 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>آلة حاسبة علمية - نمط fx-991EX</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="Study Legends تطبيق مذاكرة RPG يحفظ تقدمك محليًا ويحوّل وقت الدراسة إلى XP وذهب وإنجازات ومعارك أسبوعية." />
+  <title>Study Legends | Gamified Study RPG</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="calculator" aria-label="Scientific Calculator">
-    <section class="display-wrap">
-      <div id="expression" class="expression" aria-live="polite"></div>
-      <div id="display" class="display" aria-live="assertive">0</div>
+  <!-- Ambient background layers keep the app fantasy themed without image assets. -->
+  <div class="background-orb orb-one" aria-hidden="true"></div>
+  <div class="background-orb orb-two" aria-hidden="true"></div>
+  <div class="embers" aria-hidden="true"></div>
+
+  <main class="app-shell">
+    <header class="hero panel glow-card">
+      <div>
+        <p class="eyebrow">متعقب تركيز أسطوري</p>
+        <h1>Study Legends</h1>
+        <p class="hero-copy">حوّل المذاكرة إلى مغامرة: شغّل المؤقت، اجمع الخبرة والذهب، حافظ على السلسلة اليومية، واهزم زعيم الأسبوع بكل دقيقة تركيز.</p>
+      </div>
+      <div class="hero-actions">
+        <button id="soundToggle" class="icon-button" type="button" aria-pressed="true" title="Toggle sound effects">🔊 الصوت يعمل</button>
+        <button id="resetButton" class="ghost-button" type="button">إعادة ضبط التقدم</button>
+      </div>
+    </header>
+
+    <section class="layout-grid" aria-label="Study Legends dashboard">
+      <!-- Player progression card. -->
+      <article class="panel player-card glow-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">تقدم البطل</p>
+            <h2 id="heroTitle">كاتب مبتدئ</h2>
+          </div>
+          <span id="levelBadge" class="level-badge">Lv. 1</span>
+        </div>
+
+        <div class="avatar-wrap" aria-hidden="true">
+          <div class="avatar">🧙‍♂️</div>
+          <div class="rune rune-a">✦</div>
+          <div class="rune rune-b">◆</div>
+          <div class="rune rune-c">✧</div>
+        </div>
+
+        <div class="progress-block">
+          <div class="bar-label">
+            <span>الخبرة</span>
+            <span id="xpText">0 / 100 XP</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="الخبرة progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span id="xpBar" class="progress-fill xp-fill"></span>
+          </div>
+        </div>
+
+        <dl class="resource-grid">
+          <div>
+            <dt>الذهب</dt>
+            <dd id="goldValue">0 🪙</dd>
+          </div>
+          <div>
+            <dt>السلسلة</dt>
+            <dd id="streakValue">0 أيام 🔥</dd>
+          </div>
+          <div>
+            <dt>إجمالي المذاكرة</dt>
+            <dd id="totalStudyValue">0د</dd>
+          </div>
+          <div>
+            <dt>الجلسات</dt>
+            <dd id="sessionsValue">0</dd>
+          </div>
+        </dl>
+      </article>
+
+      <!-- Study timer is the primary interaction area. -->
+      <article class="panel timer-card glow-card">
+        <div class="section-heading centered-heading">
+          <div>
+            <p class="eyebrow">المهمة الحالية</p>
+            <h2>طقس التركيز</h2>
+          </div>
+        </div>
+
+        <div class="timer-ring" aria-live="polite">
+          <div class="timer-ring-inner">
+            <span id="timerDisplay" class="timer-display">00:00:00</span>
+            <span id="timerStatus" class="timer-status">جاهز للبدء</span>
+          </div>
+        </div>
+
+        <div class="focus-setup" aria-label="إعداد الجلسة">
+          <label for="subjectInput">
+            <span class="mini-label">مادة الدراسة</span>
+            <input id="subjectInput" type="text" maxlength="40" placeholder="مثال: رياضيات، برمجة، لغة" autocomplete="off" />
+          </label>
+          <label for="dailyGoalInput">
+            <span class="mini-label">هدف اليوم بالدقائق</span>
+            <input id="dailyGoalInput" type="number" min="5" max="720" step="5" />
+          </label>
+        </div>
+
+        <div class="timer-controls" aria-label="أزرار المؤقت">
+          <button id="startButton" class="primary-button" type="button">ابدأ</button>
+          <button id="pauseButton" class="secondary-button" type="button" disabled>إيقاف مؤقت</button>
+          <button id="stopButton" class="danger-button" type="button" disabled>إنهاء</button>
+        </div>
+
+        <div class="session-rewards">
+          <div>
+            <span class="mini-label">هذه الجلسة</span>
+            <strong id="sessionStudyValue">0د 0ث</strong>
+          </div>
+          <div>
+            <span class="mini-label">المكافأة المتوقعة</span>
+            <strong id="projectedRewardValue">+0 XP · +0 ذهب</strong>
+          </div>
+        </div>
+      </article>
+
+      <!-- Boss damage is tied directly to real elapsed study time. -->
+      <article class="panel boss-card glow-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">زعيم الأسبوع</p>
+            <h2 id="bossName">شبح التسويف</h2>
+          </div>
+          <span id="weekLabel" class="pill">Week 1</span>
+        </div>
+
+        <div class="boss-portrait" aria-hidden="true">
+          <span>🐉</span>
+        </div>
+
+        <div class="progress-block">
+          <div class="bar-label">
+            <span>صحة الزعيم</span>
+            <span id="bossHpText">1,000 / 1,000 HP</span>
+          </div>
+          <div class="progress-track boss-track" role="progressbar" aria-label="Weekly boss health" aria-valuemin="0" aria-valuemax="1000" aria-valuenow="1000">
+            <span id="bossHpBar" class="progress-fill boss-fill"></span>
+          </div>
+        </div>
+
+        <p id="bossMessage" class="boss-message">كل دقيقة تركيز تسبب 10 ضرر. اهزم الزعيم قبل بداية الأسبوع الجديد!</p>
+      </article>
+
+      <!-- الإحصائيات summarize all saved local progress. -->
+      <article class="panel stats-card glow-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">سجلات النقابة</p>
+            <h2>الإحصائيات</h2>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-tile"><span>اليوم</span><strong id="todayStudyValue">0د</strong></div>
+          <div class="stat-tile"><span>أفضل يوم</span><strong id="bestDayValue">0د</strong></div>
+          <div class="stat-tile"><span>متوسط الجلسة</span><strong id="averageSessionValue">0د</strong></div>
+          <div class="stat-tile"><span>زعماء مهزومون</span><strong id="bossesDefeatedValue">0</strong></div>
+        </div>
+        <div class="progress-block daily-goal-block">
+          <div class="bar-label">
+            <span>تقدم هدف اليوم</span>
+            <span id="dailyGoalText">0 / 120 دقيقة</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="تقدم هدف اليوم" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span id="dailyGoalBar" class="progress-fill goal-fill"></span>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel history-card glow-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">أرشيف الرحلات</p>
+            <h2>آخر الجلسات</h2>
+          </div>
+        </div>
+        <div id="historyList" class="history-list" aria-live="polite"></div>
+        <p id="historyEmpty" class="empty-state">لا توجد جلسات بعد. ابدأ أول مهمة لتسجيلها هنا.</p>
+      </article>
+
+      <!-- الإنجازات are generated from JavaScript so they stay in sync with the game rules. -->
+      <article class="panel achievements-card glow-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">خزنة الآثار</p>
+            <h2>الإنجازات</h2>
+          </div>
+          <span id="achievementCount" class="pill">0 / 0</span>
+        </div>
+        <div id="achievementsList" class="achievements-list" aria-live="polite"></div>
+      </article>
     </section>
-
-    <section class="controls">
-      <button data-action="mode-deg">DEG</button>
-      <button data-action="mode-rad">RAD</button>
-      <button data-action="clear">AC</button>
-      <button data-action="delete">DEL</button>
-      <button data-value="(">(</button>
-      <button data-value=")">)</button>
-
-      <button data-func="sin">sin</button>
-      <button data-func="cos">cos</button>
-      <button data-func="tan">tan</button>
-      <button data-func="asin">sin⁻¹</button>
-      <button data-func="acos">cos⁻¹</button>
-      <button data-func="atan">tan⁻¹</button>
-
-      <button data-func="log">log</button>
-      <button data-func="ln">ln</button>
-      <button data-func="sqrt">√</button>
-      <button data-op="^">xʸ</button>
-      <button data-op="!">x!</button>
-      <button data-func="abs">|x|</button>
-
-      <button data-const="PI">π</button>
-      <button data-const="E">e</button>
-      <button data-func="exp">EXP</button>
-      <button data-op="%">%</button>
-      <button data-op="/">÷</button>
-      <button data-op="*">×</button>
-
-      <button data-digit="7">7</button>
-      <button data-digit="8">8</button>
-      <button data-digit="9">9</button>
-      <button data-op="-">−</button>
-      <button data-digit="4">4</button>
-      <button data-digit="5">5</button>
-
-      <button data-digit="6">6</button>
-      <button data-op="+">+</button>
-      <button data-digit="1">1</button>
-      <button data-digit="2">2</button>
-      <button data-digit="3">3</button>
-      <button data-digit="0" class="zero">0</button>
-
-      <button data-digit=".">.</button>
-      <button data-action="ans">Ans</button>
-      <button data-action="equals" class="equals">=</button>
-    </section>
-
-    <p class="hint">الاختصارات: Enter =، Backspace = DEL، Esc = AC</p>
   </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="script.js"></script>
 </body>
