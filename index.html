@@ -1,68 +1,171 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>آلة حاسبة علمية - نمط fx-991EX</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="Study Legends is a gamified dark fantasy study tracker with XP, gold, achievements, streaks, and a weekly boss battle." />
+  <title>Study Legends | Gamified Study RPG</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="calculator" aria-label="Scientific Calculator">
-    <section class="display-wrap">
-      <div id="expression" class="expression" aria-live="polite"></div>
-      <div id="display" class="display" aria-live="assertive">0</div>
+  <!-- Ambient background layers keep the app fantasy themed without image assets. -->
+  <div class="background-orb orb-one" aria-hidden="true"></div>
+  <div class="background-orb orb-two" aria-hidden="true"></div>
+  <div class="embers" aria-hidden="true"></div>
+
+  <main class="app-shell">
+    <header class="hero panel glow-card">
+      <div>
+        <p class="eyebrow">Arcane Focus Tracker</p>
+        <h1>Study Legends</h1>
+        <p class="hero-copy">Forge knowledge into power. Study in real time, earn XP and gold, keep your streak alive, and weaken the weekly boss with every focused minute.</p>
+      </div>
+      <div class="hero-actions">
+        <button id="soundToggle" class="icon-button" type="button" aria-pressed="true" title="Toggle sound effects">🔊 Sound On</button>
+        <button id="resetButton" class="ghost-button" type="button">Reset Quest Log</button>
+      </div>
+    </header>
+
+    <section class="layout-grid" aria-label="Study Legends dashboard">
+      <!-- Player progression card. -->
+      <article class="panel player-card glow-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Hero Progress</p>
+            <h2 id="heroTitle">Novice Scribe</h2>
+          </div>
+          <span id="levelBadge" class="level-badge">Lv. 1</span>
+        </div>
+
+        <div class="avatar-wrap" aria-hidden="true">
+          <div class="avatar">🧙‍♂️</div>
+          <div class="rune rune-a">✦</div>
+          <div class="rune rune-b">◆</div>
+          <div class="rune rune-c">✧</div>
+        </div>
+
+        <div class="progress-block">
+          <div class="bar-label">
+            <span>Experience</span>
+            <span id="xpText">0 / 100 XP</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="Experience progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span id="xpBar" class="progress-fill xp-fill"></span>
+          </div>
+        </div>
+
+        <dl class="resource-grid">
+          <div>
+            <dt>Gold</dt>
+            <dd id="goldValue">0 🪙</dd>
+          </div>
+          <div>
+            <dt>Streak</dt>
+            <dd id="streakValue">0 days 🔥</dd>
+          </div>
+          <div>
+            <dt>Total Study</dt>
+            <dd id="totalStudyValue">0m</dd>
+          </div>
+          <div>
+            <dt>Sessions</dt>
+            <dd id="sessionsValue">0</dd>
+          </div>
+        </dl>
+      </article>
+
+      <!-- Study timer is the primary interaction area. -->
+      <article class="panel timer-card glow-card">
+        <div class="section-heading centered-heading">
+          <div>
+            <p class="eyebrow">Current Quest</p>
+            <h2>Focus Ritual</h2>
+          </div>
+        </div>
+
+        <div class="timer-ring" aria-live="polite">
+          <div class="timer-ring-inner">
+            <span id="timerDisplay" class="timer-display">00:00:00</span>
+            <span id="timerStatus" class="timer-status">Ready to begin</span>
+          </div>
+        </div>
+
+        <div class="timer-controls" aria-label="Timer controls">
+          <button id="startButton" class="primary-button" type="button">Start</button>
+          <button id="pauseButton" class="secondary-button" type="button" disabled>Pause</button>
+          <button id="stopButton" class="danger-button" type="button" disabled>Stop</button>
+        </div>
+
+        <div class="session-rewards">
+          <div>
+            <span class="mini-label">This Session</span>
+            <strong id="sessionStudyValue">0m 0s</strong>
+          </div>
+          <div>
+            <span class="mini-label">Projected Reward</span>
+            <strong id="projectedRewardValue">+0 XP · +0 Gold</strong>
+          </div>
+        </div>
+      </article>
+
+      <!-- Boss damage is tied directly to real elapsed study time. -->
+      <article class="panel boss-card glow-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Weekly Boss</p>
+            <h2 id="bossName">The Deadline Wraith</h2>
+          </div>
+          <span id="weekLabel" class="pill">Week 1</span>
+        </div>
+
+        <div class="boss-portrait" aria-hidden="true">
+          <span>🐉</span>
+        </div>
+
+        <div class="progress-block">
+          <div class="bar-label">
+            <span>Boss HP</span>
+            <span id="bossHpText">1,000 / 1,000 HP</span>
+          </div>
+          <div class="progress-track boss-track" role="progressbar" aria-label="Weekly boss health" aria-valuemin="0" aria-valuemax="1000" aria-valuenow="1000">
+            <span id="bossHpBar" class="progress-fill boss-fill"></span>
+          </div>
+        </div>
+
+        <p id="bossMessage" class="boss-message">Every focused minute deals 10 damage. Defeat the boss before the week resets!</p>
+      </article>
+
+      <!-- Statistics summarize all saved local progress. -->
+      <article class="panel stats-card glow-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Guild Records</p>
+            <h2>Statistics</h2>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-tile"><span>Today</span><strong id="todayStudyValue">0m</strong></div>
+          <div class="stat-tile"><span>Best Day</span><strong id="bestDayValue">0m</strong></div>
+          <div class="stat-tile"><span>Avg Session</span><strong id="averageSessionValue">0m</strong></div>
+          <div class="stat-tile"><span>Bosses Defeated</span><strong id="bossesDefeatedValue">0</strong></div>
+        </div>
+      </article>
+
+      <!-- Achievements are generated from JavaScript so they stay in sync with the game rules. -->
+      <article class="panel achievements-card glow-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Relic Vault</p>
+            <h2>Achievements</h2>
+          </div>
+          <span id="achievementCount" class="pill">0 / 0</span>
+        </div>
+        <div id="achievementsList" class="achievements-list" aria-live="polite"></div>
+      </article>
     </section>
-
-    <section class="controls">
-      <button data-action="mode-deg">DEG</button>
-      <button data-action="mode-rad">RAD</button>
-      <button data-action="clear">AC</button>
-      <button data-action="delete">DEL</button>
-      <button data-value="(">(</button>
-      <button data-value=")">)</button>
-
-      <button data-func="sin">sin</button>
-      <button data-func="cos">cos</button>
-      <button data-func="tan">tan</button>
-      <button data-func="asin">sin⁻¹</button>
-      <button data-func="acos">cos⁻¹</button>
-      <button data-func="atan">tan⁻¹</button>
-
-      <button data-func="log">log</button>
-      <button data-func="ln">ln</button>
-      <button data-func="sqrt">√</button>
-      <button data-op="^">xʸ</button>
-      <button data-op="!">x!</button>
-      <button data-func="abs">|x|</button>
-
-      <button data-const="PI">π</button>
-      <button data-const="E">e</button>
-      <button data-func="exp">EXP</button>
-      <button data-op="%">%</button>
-      <button data-op="/">÷</button>
-      <button data-op="*">×</button>
-
-      <button data-digit="7">7</button>
-      <button data-digit="8">8</button>
-      <button data-digit="9">9</button>
-      <button data-op="-">−</button>
-      <button data-digit="4">4</button>
-      <button data-digit="5">5</button>
-
-      <button data-digit="6">6</button>
-      <button data-op="+">+</button>
-      <button data-digit="1">1</button>
-      <button data-digit="2">2</button>
-      <button data-digit="3">3</button>
-      <button data-digit="0" class="zero">0</button>
-
-      <button data-digit=".">.</button>
-      <button data-action="ans">Ans</button>
-      <button data-action="equals" class="equals">=</button>
-    </section>
-
-    <p class="hint">الاختصارات: Enter =، Backspace = DEL، Esc = AC</p>
   </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="script.js"></script>
 </body>
