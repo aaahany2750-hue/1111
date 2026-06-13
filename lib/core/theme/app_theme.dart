@@ -1,0 +1,2 @@
+import 'package:flutter/material.dart';
+class AppTheme { static ThemeData light(ColorScheme? dynamicScheme)=>ThemeData(useMaterial3: true, colorScheme: dynamicScheme ?? ColorScheme.fromSeed(seedColor: Colors.indigo)); static ThemeData dark(ColorScheme? dynamicScheme)=>ThemeData(useMaterial3: true, colorScheme: dynamicScheme ?? ColorScheme.fromSeed(seedColor: Colors.indigo, brightness: Brightness.dark)); }
